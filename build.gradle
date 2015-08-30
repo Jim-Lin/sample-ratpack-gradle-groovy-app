@@ -1,0 +1,69 @@
+buildscript {
+    repositories {
+        maven { url "http://oss.jfrog.org/artifactory/repo" }
+        maven { url "https://plugins.gradle.org/m2/" } // for gradle-docker-plugin
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.ratpack:ratpack-gradle:0.9.18'
+        classpath "de.gesellix:gradle-docker-plugin:2015-08-27T23-12-48"
+    }
+}
+
+// The “ratpack” plugin applies the “application” plugin, making it easy to create a standalone application.
+// See: http://gradle.org/docs/current/userguide/application_plugin.html
+apply plugin: "io.ratpack.ratpack-groovy"
+apply plugin: "de.gesellix.docker"
+
+
+repositories {
+  maven { url "http://oss.jfrog.org/artifactory/repo" }
+  jcenter()
+}
+
+configurations.all {
+    exclude module: "groovy"
+}
+
+dependencies {
+    // Default SLF4J binding. Note that this is a blocking implementation.
+    // See here for a non blocking appender http://logging.apache.org/log4j/2.x/manual/async.html
+    runtime 'org.slf4j:slf4j-simple:1.7.7'
+}
+
+//some CI config
+apply from: "gradle/ci.gradle"
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.google.apis:google-api-services-customsearch:v1-rev46-1.20.0'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+}
+
+
+
+import de.gesellix.gradle.docker.tasks.DockerBuildTask
+
+ext {
+    localDockerHost = System.env.DOCKER_HOST
+}
+
+allprojects {
+    apply plugin: 'base'
+    apply plugin: "de.gesellix.docker"
+
+    docker {
+        dockerHost = localDockerHost
+    }
+}
+
+task buildImage(type: DockerBuildTask) {
+    imageName = "sample-app"
+    buildContextDirectory = file(".")
+}
+

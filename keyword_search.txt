@@ -1,0 +1,16 @@
+*** Settings ***
+Suite Teardown    Delete All Sessions
+Library           Collections
+Library           String
+Library           src/RequestsLibrary/RequestsKeywords.py
+Library           OperatingSystem
+
+*** Test Cases ***
+Get Request with Url Parameters
+    [Tags]    get
+    Create Session    sample    http://localhost:5050
+    ${params}=    Create Dictionary    limit=1
+    ${resp}=    Get Request    sample    /keyword    params=${params}
+    Should Be Equal As Strings    ${resp.status_code}    200
+    ${jsondata}=    To Json    ${resp.content}
+    Should be Equal    ${jsondata['data'][0]['link']}    http://www.ruckuswireless.com/
