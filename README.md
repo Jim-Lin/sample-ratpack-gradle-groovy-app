@@ -70,7 +70,9 @@ before build this project to Docker image, you need install [Docker](http://docs
 starts a stopped docker machine
 
 ```bash
-$ boot2docker start
+$ boot2docker up
+# or docker-machine
+$ docker-machine start
 ```
 
 * by Docker
@@ -148,6 +150,9 @@ check host ip
 $ boot2docker ip
 
 192.168.59.103
+
+# or docker-machine
+$ docker-machine ip
 ```
 
 then, you can search like<br />
